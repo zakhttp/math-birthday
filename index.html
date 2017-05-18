@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Math Birthday</title>
+  <link href="http://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Lato|Lobster+Two" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.0/animate.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.2/css/materialize.min.css" media="screen,projection">
+  <style>
+    .page {
+      height: 100vh;
+      padding-right: 20px;
+      padding-left: 20px;
+    }
+
+    .section {
+      padding-top: 2rem;
+      padding-bottom: 2rem;
+    }
+
+    .logo {
+      font-size: 50px;
+    }
+
+    .center-block {
+      margin: 0 auto;
+    }
+
+    input[type=text] {
+      text-align: center;
+      border-bottom: 1px solid #cccccc;
+      height: 3rem;
+      font-size: 1.1em;
+      margin-bottom: 50px;
+    }
+
+     ::-webkit-input-placeholder {
+      color: #eeeeee;
+      font-size: 1em;
+    }
+
+    .prefix {
+      font-size: 3em !important;
+    }
+
+    body {
+      font-family: 'Lato', sans-serif;
+    }
+
+    h1,
+    h2,
+    h3 {
+      font-family: 'Lobster Two', cursive;
+    }
+  </style>
+</head>
+
+<body>
+  <main class="container-fluid">
+    <section id="form" class="page red lighten-2 white-text valign-wrapper">
+      <div class="center-block center-align animated zoomIn">
+        <i class="logo material-icons animated rubberBand">cake</i>
+        <h1>Math Birthday</h1>
+        <p>Never miss your awesome Math birthday again!</p>
+        <div class="input-field section">
+          <input id="birth-date" type="date" class="datepicker white-text" placeholder="Select a date">
+          <a href="#results" id="calculate" class="btn teal lighten-2 waves-effect waves-dark">Calculate</a>
+          <p id="error-bag"></p>
+        </div>
+      </div>
+    </section>
+    <section id="results" class="page teal lighten-2 white-text valign-wrapper">
+      <div class="center-block center-align animated zoomIn">
+        <h2>Your next Math birthday is</h2>
+        <p>your <span id="MathBirthdayIndex"></span>-day-old birthday on <span id="MathBirthdayDate"></span> date</p>
+        <div class="input-field section">
+          <a href="#form" id="try-again" class="btn-floating btn-large red lighten-2 waves-effect waves-dark"><i class="material-icons">cached</i></a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!--Import jQuery before materialize.js-->
+  <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.2/js/materialize.min.js"></script>
+  <script>
+    $(document).ready(function () {
+
+      // months map
+      var months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+      // hide the results seciton initially
+      $('#results').hide();
+      $('#calculate').prop('disabled', 'disabled');
+
+      // set up the datepicker
+      var $input = $('.datepicker').pickadate({
+        selectMonths: true,
+        selectYears: 100,
+        today: '',
+        min: new Date(1900, 1, 1),
+        max: new Date(),
+        onSet: function () {
+          $('#calculate').prop('disabled', 'enabled');
+        }
+      });
+
+      // retrieve the date picker selected date
+      var picker = $input.pickadate('picker');
+
+      // handle click events on calculate button
+      $('#calculate').on('click', function () {
+        var birthDate = picker.get('select');
+        if (!birthDate) {
+          $('#error-bag').html('Please select a date first');
+          return;
+        }
+        getMathBirthday(birthDate.pick);
+        $('#form').hide();
+        $('#results').show();
+        $('#error-bag').html('');
+      });
+
+      // handle click evebts on try-again button
+      $('#try-again').on('click', function () {
+        $('#results').hide();
+        $('#form').show();
+      });
+
+      // calculate the next Math birthday
+      function getMathBirthday(birthDate) {
+        var today = new Date(),
+          // calculate age in days
+          ageInDays = getAgeInDays(birthDate, today.getTime()),
+          nextMathBirthdayIndex,
+          nextMathBirthdayInDays = 10,
+          nextMathBirthdayDate = addDays(today, nextMathBirthdayInDays);
+
+        for (var i = 1, j = 1; i <= ageInDays; i *= 10, j++) {
+          nextMathBirthdayIndex = Math.pow(10, j);
+          nextMathBirthdayInDays = nextMathBirthdayIndex - ageInDays;
+        }
+        nextMathBirthdayDate = addDays(today, nextMathBirthdayInDays);
+
+        // display the results
+        $('#MathBirthdayIndex').html(nextMathBirthdayIndex);
+        $('#MathBirthdayDate').html(nextMathBirthdayDate.getDate().toString() + ', ' + months[nextMathBirthdayDate.getMonth()] + ' ' + nextMathBirthdayDate.getFullYear().toString());
+
+      }
+
+      // add days to a date
+      function addDays(startDate, numberOfDays) {
+        var result = new Date();
+        result.setDate(startDate.getDate() + numberOfDays);
+        return result;
+      }
+
+      // calculate the age in days
+      function getAgeInDays(birthDate, today) {
+        var oneDay = 24 * 60 * 60 * 1000;
+        return Math.floor((today - birthDate) / oneDay);
+      }
+    });
+  </script>
+</body>
+
+</html>
